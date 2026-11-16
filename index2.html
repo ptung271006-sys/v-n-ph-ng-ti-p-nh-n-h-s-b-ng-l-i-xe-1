@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Văn Phòng Tiếp Nhận Hồ Sơ Bằng Lái Tuấn Anh</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#1e3a8a',
+                            900: '#0f172a',
+                            950: '#090d16',
+                        },
+                        amberbrand: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        /* Tùy chỉnh thanh cuộn */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .fade-in { animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-blue-700 selection:text-white">
+
+    <!-- TOAST THÔNG BÁO (Thay thế alert) -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- MODAL XÁC NHẬN (Thay thế confirm) -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 fade-in">
+            <div class="flex items-center gap-3 text-red-600 mb-3">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900" id="confirm-title">Xác nhận thao tác</h3>
+            </div>
+            <p class="text-slate-600 text-sm mb-6" id="confirm-message">Bạn có chắc chắn muốn thực hiện thao tác này?</p>
+            <div class="flex justify-end gap-3">
+                <button id="confirm-cancel" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">Hủy bỏ</button>
+                <button id="confirm-ok" class="px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition shadow-sm">Đồng ý</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 1. THANH THÔNG TIN NHANH & HEADER ĐIỀU HƯỚNG                           -->
+    <!-- ===================================================================== -->
+    <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800 hidden md:block">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-6">
+                <span><i class="fa-solid fa-location-dot text-amber-400 mr-1.5"></i><span id="topbar-address">Số 86 Đường Giải Phóng, Quận Hoàng Mai, Hà Nội</span></span>
+                <span><i class="fa-solid fa-clock text-amber-400 mr-1.5"></i>Tiếp nhận hồ sơ: 07:30 - 18:30 (Tất cả các ngày trong tuần)</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a id="topbar-phone-link" href="tel:0901234567" class="text-white font-semibold hover:text-amber-400 transition">
+                    <i class="fa-solid fa-phone-volume text-amber-400 mr-1.5"></i>Hotline: <span id="topbar-phone">0901.234.567</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <!-- Logo & Tên Văn Phòng -->
+                <a href="#" onclick="showPublicView()" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-blue-900 to-blue-700 text-amber-400 flex items-center justify-center shadow-md group-hover:scale-105 transition shrink-0">
+                        <i class="fa-solid fa-steering-wheel text-xl"></i>
+                        <i class="fa-solid fa-car-side text-lg md:text-xl"></i>
+                    </div>
+                    <div>
+                        <span id="header-office-name" class="font-extrabold text-sm sm:text-base md:text-lg text-blue-950 tracking-tight block leading-tight">Văn Phòng Tiếp Nhận Hồ Sơ Bằng Lái Tuấn Anh</span>
+                        <span class="text-[11px] font-semibold text-amber-600 uppercase tracking-wider block">Đào Tạo & Sát Hạch Lái Xe Chuẩn Bộ GTVT</span>
+                    </div>
+                </a>
+
+                <!-- Menu Desktop -->
+                <nav class="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-600">
+                    <a href="#top" onclick="showPublicView()" class="hover:text-blue-800 transition py-2">Trang chủ</a>
+                    <a href="#tra-cuu" onclick="showPublicView()" class="hover:text-blue-800 transition py-2">Tra cứu Lịch Học & Lịch Dạy</a>
+                    <a href="#app-600-cau" onclick="showPublicView()" class="hover:text-blue-800 transition py-2">App Thi 600 Câu & Lịch Thi</a>
+                    <a href="#dang-ky-ho-so" onclick="showPublicView()" class="hover:text-blue-800 transition py-2">Đăng ký Hồ Sơ</a>
+                </nav>
+
+                <!-- Nút Đăng nhập Admin / Vào Bảng Quản Trị -->
+                <div class="flex items-center gap-2.5">
+                    <button id="btn-admin-login" onclick="openAdminLoginModal()" class="px-4 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-user-shield text-amber-400"></i>
+                        <span>Đăng nhập Admin</span>
+                    </button>
+
+                    <div id="admin-logged-actions" class="hidden items-center gap-2">
+                        <button onclick="showAdminView()" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs sm:text-sm font-extrabold shadow-sm transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Quản trị Web</span>
+                        </button>
+                        <button onclick="adminLogout()" title="Đăng xuất Admin" class="p-2.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 transition">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </div>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button onclick="toggleMobileMenu()" class="lg:hidden p-2.5 rounded-xl text-slate-700 hover:bg-slate-100">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-slate-200 px-4 pt-2 pb-4 space-y-1 shadow-lg">
+            <a href="#top" onclick="showPublicView(); toggleMobileMenu()" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-800">Trang chủ</a>
+            <a href="#tra-cuu" onclick="showPublicView(); toggleMobileMenu()" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-800">Tra cứu Lịch Học & Lịch Dạy</a>
+            <a href="#app-600-cau" onclick="showPublicView(); toggleMobileMenu()" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-800">App Thi 600 Câu & Lịch Thi</a>
+            <a href="#dang-ky-ho-so" onclick="showPublicView(); toggleMobileMenu()" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-800">Đăng ký Hồ Sơ</a>
+        </div>
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 1: GIAO DIỆN TRANG CHỦ CÔNG KHAI (HỌC VIÊN & GIÁO VIÊN)          -->
+    <!-- ===================================================================== -->
+    <main id="public-view" class="block">
+
+        <!-- HERO BANNER -->
+        <section id="top" class="relative bg-gradient-to-br from-slate-950 via-blue-950 to-blue-900 text-white overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-7 space-y-5">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-bold">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                            Tuyển sinh & Tiếp nhận hồ sơ trực tiếp các hạng A1, A2, B1, B2, C
+                        </div>
+                        <h1 id="hero-title" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight">
+                            Văn Phòng Tiếp Nhận Hồ Sơ Bằng Lái <span class="text-amber-400">Tuấn Anh</span>
+                        </h1>
+                        <p class="text-blue-100/90 text-sm sm:text-base max-w-2xl leading-relaxed">
+                            Thủ tục tinh gọn chỉ cần CCCD — Hỗ trợ khám sức khỏe và chụp ảnh tại văn phòng. Học thực hành 1 thầy 1 trò trên xe đời mới, tự do chọn lịch học phù hợp công việc.
+                        </p>
+                        <div class="flex flex-wrap gap-3 pt-2">
+                            <a href="#tra-cuu" class="px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-500/25 transition flex items-center gap-2">
+                                <i class="fa-solid fa-magnifying-glass"></i> Tra Cứu Lịch Học / Lịch Dạy
+                            </a>
+                            <a href="#dang-ky-ho-so" class="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-bold text-sm transition flex items-center gap-2">
+                                <i class="fa-solid fa-file-signature"></i> Nộp Hồ Sơ Trực Tuyến
+                            </a>
+                        </div>
+                        <div class="pt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-blue-200 border-t border-white/15">
+                            <span><i class="fa-solid fa-phone text-amber-400 mr-1.5"></i>Hotline tư vấn: <strong id="hero-phone" class="text-white">0901.234.567</strong></span>
+                            <span><i class="fa-solid fa-location-dot text-amber-400 mr-1.5"></i>Địa chỉ: <strong id="hero-address" class="text-white">Số 86 Đường Giải Phóng, Quận Hoàng Mai, Hà Nội</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Thẻ Tóm Tắt Các Hạng Bằng -->
+                    <div class="lg:col-span-5">
+                        <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl">
+                            <h2 class="text-base font-extrabold text-amber-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-award"></i> Chương Trình Đào Tạo Trọng Điểm
+                            </h2>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div>
+                                        <span class="font-bold text-white block">Hạng A1 / A2 (Mô tô 2 bánh)</span>
+                                        <span class="text-xs text-blue-200">Thi sát hạch liên tục hàng tuần</span>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-bold text-xs">1 - 2 Tuần</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div>
+                                        <span class="font-bold text-white block">Hạng B1 (Ô tô số tự động)</span>
+                                        <span class="text-xs text-blue-200">Xe gia đình dưới 9 chỗ, dễ lái</span>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-lg bg-blue-500/30 text-blue-200 font-bold text-xs">3 Tháng</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div>
+                                        <span class="font-bold text-white block">Hạng B2 (Ô tô số sàn & tự động)</span>
+                                        <span class="text-xs text-blue-200">Được phép kinh doanh vận tải</span>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-lg bg-emerald-500/25 text-emerald-300 font-bold text-xs">3.5 Tháng</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div>
+                                        <span class="font-bold text-white block">Hạng C (Xe tải trên 3.5 tấn)</span>
+                                        <span class="text-xs text-blue-200">Chạy đủ 810km đường trường DAT</span>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-lg bg-purple-500/25 text-purple-200 font-bold text-xs">5.5 Tháng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- 2. KHU VỰC TRA CỨU KHÔNG CẦN ĐĂNG NHẬP (HỌC VIÊN & THẦY GIÁO)     -->
+        <!-- ================================================================= -->
+        <section id="tra-cuu" class="py-12 md:py-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+                <!-- Thanh chọn 2 Tab Tra Cứu -->
+                <div class="grid grid-cols-2 bg-slate-100 border-b border-slate-200">
+                    <button id="lookup-tab-student" onclick="switchLookupTab('student')" class="py-4 px-4 sm:px-6 text-sm sm:text-base font-extrabold flex items-center justify-center gap-2.5 bg-white text-blue-900 border-t-4 border-amber-500 transition">
+                        <i class="fa-solid fa-user-graduate text-amber-600 text-lg"></i>
+                        <span>Tra cứu Học viên (Theo SĐT)</span>
+                    </button>
+                    <button id="lookup-tab-teacher" onclick="switchLookupTab('teacher')" class="py-4 px-4 sm:px-6 text-sm sm:text-base font-bold flex items-center justify-center gap-2.5 text-slate-600 hover:text-blue-900 hover:bg-slate-50 border-t-4 border-transparent transition">
+                        <i class="fa-solid fa-chalkboard-user text-blue-700 text-lg"></i>
+                        <span>Tra cứu Lịch Dạy Thầy Giáo</span>
+                    </button>
+                </div>
+
+                <!-- NỘI DUNG TAB 1: TRA CỨU HỌC VIÊN THEO SĐT -->
+                <div id="lookup-panel-student" class="p-6 sm:p-8 md:p-10">
+                    <div class="max-w-2xl mx-auto text-center mb-6">
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Tra Cứu Thông Tin Khóa Học & Lịch Chạy Xe</h2>
+                        <p class="text-slate-600 text-sm mt-1">Học viên không cần đăng nhập, chỉ cần nhập đúng số điện thoại đã đăng ký hồ sơ.</p>
+                    </div>
+
+                    <form onsubmit="handleStudentLookup(event)" class="max-w-xl mx-auto">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-1">
+                                <i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="tel" id="input-student-phone" required placeholder="Nhập số điện thoại của bạn..." class="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-slate-300 focus:border-blue-800 focus:ring-4 focus:ring-blue-800/10 outline-none text-base font-semibold text-slate-900 transition">
+                            </div>
+                            <button type="submit" class="px-7 py-3.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-extrabold text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 shrink-0">
+                                <i class="fa-solid fa-magnifying-glass"></i> Tra cứu ngay
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2 text-center">
+                            Định dạng 10 chữ số viết liền không dấu cách (Ví dụ: 0987654321).
+                        </p>
+                    </form>
+
+                    <!-- Kết quả tra cứu Học viên -->
+                    <div id="student-lookup-result" class="mt-8 hidden fade-in"></div>
+                </div>
+
+                <!-- NỘI DUNG TAB 2: TRA CỨU LỊCH DẠY THẦY GIÁO THEO TÊN -->
+                <div id="lookup-panel-teacher" class="hidden p-6 sm:p-8 md:p-10">
+                    <div class="max-w-2xl mx-auto text-center mb-6">
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Tra Cứu Lịch Giảng Dạy & Danh Sách Học Viên</h2>
+                        <p class="text-slate-600 text-sm mt-1">Thầy giáo nhập họ tên hoặc chọn nhanh tên mình để xem lịch chạy xe và học viên từng buổi.</p>
+                    </div>
+
+                    <form onsubmit="handleTeacherLookup(event)" class="max-w-xl mx-auto">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-1">
+                                <i class="fa-solid fa-user-tie absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" id="input-teacher-name" list="teacher-datalist" required placeholder="Nhập tên thầy giáo (VD: Nguyễn Văn Hùng)..." class="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-slate-300 focus:border-blue-800 focus:ring-4 focus:ring-blue-800/10 outline-none text-base font-semibold text-slate-900 transition">
+                                <datalist id="teacher-datalist"></datalist>
+                            </div>
+                            <button type="submit" class="px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2 shrink-0">
+                                <i class="fa-solid fa-calendar-check"></i> Xem lịch dạy
+                            </button>
+                        </div>
+                        <!-- Các nút chọn nhanh tên thầy giáo có trong hệ thống -->
+                        <div id="quick-teacher-pills" class="flex flex-wrap items-center justify-center gap-2 mt-3"></div>
+                    </form>
+
+                    <!-- Kết quả tra cứu Thầy giáo -->
+                    <div id="teacher-lookup-result" class="mt-8 hidden fade-in"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- 3. MỤC TẢI APP THI TRẮC NGHIỆM 600 CÂU GPLX & THÔNG BÁO LỊCH THI   -->
+        <!-- ================================================================= -->
+        <section id="app-600-cau" class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Cột Trái (7 cột): Tải App Thi Trắc Nghiệm 600 Câu GPLX -->
+                <div class="lg:col-span-7 bg-gradient-to-br from-blue-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute -right-12 -bottom-12 w-56 h-56 bg-amber-500/15 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold mb-4">
+                            <i class="fa-solid fa-mobile-screen-button"></i> Phần mềm ôn luyện chuẩn Tổng cục Đường bộ
+                        </div>
+                        <h2 id="app-section-title" class="text-2xl sm:text-3xl font-extrabold leading-snug">
+                            Tải App Ôn Thi Trắc Nghiệm GPLX 600 Câu Hỏi & Mô Phỏng
+                        </h2>
+                        <p id="app-section-desc" class="text-blue-100/85 text-sm mt-3 leading-relaxed">
+                            Bộ đề thi thử ngẫu nhiên chuẩn cấu trúc sát hạch mới nhất cho các hạng A1, A2, B1, B2, C. Tích hợp riêng danh sách 60 câu điểm liệt, mẹo ghi nhớ biển báo và giải thích đáp án chi tiết.
+                        </p>
+
+                        <!-- 3 Nút Tải App (Link do Admin điều chỉnh) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-6">
+                            <a id="link-app-android" href="https://play.google.com/store" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center gap-3 shadow-md">
+                                <i class="fa-brands fa-google-play text-2xl shrink-0"></i>
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wider text-emerald-100 block">Tải cho Android</span>
+                                    <span class="font-extrabold text-sm">CH Play / APK</span>
+                                </div>
+                            </a>
+
+                            <a id="link-app-ios" href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white transition flex items-center gap-3 shadow-md">
+                                <i class="fa-brands fa-apple text-2xl shrink-0"></i>
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wider text-blue-100 block">Tải cho iPhone</span>
+                                    <span class="font-extrabold text-sm">App Store iOS</span>
+                                </div>
+                            </a>
+
+                            <a id="link-app-pc" href="https://daotaolaixe.gov.vn" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 transition flex items-center gap-3 shadow-md">
+                                <i class="fa-solid fa-desktop text-xl shrink-0"></i>
+                                <div>
+                                    <span class="text-[10px] uppercase tracking-wider text-slate-800 font-bold block">Máy tính / Web</span>
+                                    <span class="font-extrabold text-sm">Thi Thử Online</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Mẹo ôn thi 60 câu điểm liệt -->
+                    <div class="mt-6 pt-5 border-t border-white/15">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-400 mb-2">
+                            <i class="fa-solid fa-lightbulb mr-1.5"></i>Lưu ý quan trọng khi ôn 600 câu hỏi:
+                        </h4>
+                        <ul class="text-xs text-blue-100/90 space-y-1.5">
+                            <li>• Tuyệt đối không làm sai <strong>60 câu điểm liệt</strong> (tình huống mất an toàn giao thông nghiêm trọng).</li>
+                            <li>• Học viên nên làm tối thiểu 15 bộ đề thi thử trên App trước ngày thi sát hạch chính thức.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Cột Phải (5 cột): Thông Báo Lịch Thi Sát Hạch Từ Văn Phòng -->
+                <div class="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-4">
+                            <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-extrabold flex items-center gap-1.5">
+                                <i class="fa-solid fa-bullhorn"></i> THÔNG BÁO TỪ VĂN PHÒNG
+                            </span>
+                            <span id="exam-notice-updated" class="text-[11px] font-medium text-slate-400">Cập nhật mới nhất</span>
+                        </div>
+
+                        <h3 id="exam-notice-title" class="text-xl font-extrabold text-slate-900 mb-3">
+                            Lịch Thi Sát Hạch & Ôn Xe Chip Tháng 11/2026
+                        </h3>
+
+                        <div id="exam-notice-content" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4">
+                            • Khóa B1 & B2 K24: Thi tốt nghiệp ngày 22/11/2026 tại Sân sát hạch Ngọc Hồi.
+                            • Lịch ghép xe chip cảm ứng: Đăng ký trực tiếp với Thầy phụ trách hoặc gọi Hotline văn phòng trước 3 ngày.
+                            • Học viên đi thi nhớ mang theo CCCD bản gốc còn hạn sử dụng và có mặt trước 07:00 sáng.
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <span>Cần hỗ trợ cài đặt App 600 câu?</span>
+                        <a id="notice-call-btn" href="tel:0901234567" class="font-bold text-blue-800 hover:underline">
+                            <i class="fa-solid fa-phone mr-1"></i>Gọi Văn Phòng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- 4. FORM ĐĂNG KÝ NỘP HỒ SƠ ONLINE (DÀNH CHO KHÁCH MỚI)             -->
+        <!-- ================================================================= -->
+        <section id="dang-ky-ho-so" class="py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-12">
+                <div class="md:col-span-5 bg-blue-950 text-white p-7 sm:p-8 flex flex-col justify-between">
+                    <div>
+                        <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold">Đăng ký trực tuyến</span>
+                        <h2 class="text-2xl font-extrabold mt-3 leading-snug">Nộp Hồ Sơ Học Lái Xe Ngay Hôm Nay</h2>
+                        <p class="text-blue-200 text-sm mt-2.5 leading-relaxed">
+                            Điền thông tin bên cạnh, hồ sơ của bạn sẽ được chuyển trực tiếp tới bộ phận tiếp nhận của Văn phòng Tuấn Anh.
+                        </p>
+                        <div class="mt-6 space-y-3 text-xs text-blue-100">
+                            <div class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-circle-check text-amber-400 text-sm"></i>
+                                <span>Hỗ trợ làm hồ sơ & khám sức khỏe trọn gói</span>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-circle-check text-amber-400 text-sm"></i>
+                                <span>Đóng học phí linh hoạt làm 2 đợt</span>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-circle-check text-amber-400 text-sm"></i>
+                                <span>Xếp lịch học thực hành ngay sau khi duyệt</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-white/15 text-xs text-blue-300">
+                        <i class="fa-solid fa-shield-halved text-amber-400 mr-1"></i> Cam kết không phát sinh chi phí ngoài hợp đồng.
+                    </div>
+                </div>
+
+                <div class="md:col-span-7 p-7 sm:p-8">
+                    <form onsubmit="submitNewRegistration(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">Họ và tên <span class="text-red-500">*</span></label>
+                                <input type="text" id="reg-fullname" required placeholder="VD: Nguyễn Văn An" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-800 focus:ring-2 focus:ring-blue-800/15 outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">Số điện thoại <span class="text-red-500">*</span></label>
+                                <input type="tel" id="reg-phone" required pattern="[0-9]{9,11}" placeholder="VD: 0987654321" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-800 focus:ring-2 focus:ring-blue-800/15 outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">Hạng bằng muốn đăng ký <span class="text-red-500">*</span></label>
+                            <select id="reg-license" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-800 focus:ring-2 focus:ring-blue-800/15 outline-none text-sm bg-white font-medium">
+                                <option value="Hạng B2 (Số sàn)">Hạng B2 (Ô tô số sàn & tự động)</option>
+                                <option value="Hạng B1 (Số tự động)">Hạng B1 (Ô tô số tự động)</option>
+                                <option value="Hạng C (Xe tải)">Hạng C (Xe tải trên 3.5 tấn)</option>
+                                <option value="Hạng A1">Hạng A1 (Xe máy dưới 175cc)</option>
+                                <option value="Hạng A2">Hạng A2 (Mô tô phân khối lớn)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">Ghi chú thêm (Lịch rảnh, nhu cầu tư vấn...)</label>
+                            <textarea id="reg-note" rows="3" placeholder="VD: Tôi muốn đăng ký học thực hành vào thứ 7 và Chủ nhật..." class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-800 focus:ring-2 focus:ring-blue-800/15 outline-none text-sm"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Gửi Hồ Sơ Đăng Ký
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 2: BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN (ADMIN DASHBOARD TOÀN QUYỀN)    -->
+    <!-- ===================================================================== -->
+    <section id="admin-view" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header Admin -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+                <div class="flex items-center gap-2.5">
+                    <span class="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800 text-xs font-extrabold">ADMIN TOÀN QUYỀN</span>
+                    <button onclick="showPublicView()" class="text-xs font-bold text-blue-800 hover:underline">&larr; Xem Trang Chủ Công Khai</button>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Quản Trị Hệ Thống Văn Phòng Tuấn Anh</h1>
+            </div>
+
+            <!-- Thống kê nhanh -->
+            <div class="flex flex-wrap gap-3">
+                <div class="bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-[11px] font-bold text-slate-500 uppercase block">Học viên</span>
+                    <span id="stat-students" class="text-lg font-extrabold text-blue-900">0</span>
+                </div>
+                <div class="bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-[11px] font-bold text-slate-500 uppercase block">Lịch chạy xe</span>
+                    <span id="stat-schedules" class="text-lg font-extrabold text-emerald-700">0</span>
+                </div>
+                <div class="bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-[11px] font-bold text-slate-500 uppercase block">Hồ sơ chờ duyệt</span>
+                    <span id="stat-pending" class="text-lg font-extrabold text-amber-600">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thanh 5 Tab Quản Trị -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="flex border-b border-slate-200 bg-slate-50 overflow-x-auto">
+                <button id="adm-tab-btn-students" onclick="switchAdminTab('students')" class="py-3.5 px-5 text-sm font-extrabold text-blue-900 border-b-3 border-blue-900 bg-white whitespace-nowrap flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i> 1. Quản lý Học viên
+                </button>
+                <button id="adm-tab-btn-schedules" onclick="switchAdminTab('schedules')" class="py-3.5 px-5 text-sm font-semibold text-slate-600 hover:text-blue-900 whitespace-nowrap flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days"></i> 2. Quản lý Lịch chạy & Lịch dạy
+                </button>
+                <button id="adm-tab-btn-registrations" onclick="switchAdminTab('registrations')" class="py-3.5 px-5 text-sm font-semibold text-slate-600 hover:text-blue-900 whitespace-nowrap flex items-center gap-2">
+                    <i class="fa-solid fa-file-circle-plus"></i> 3. Hồ sơ đăng ký mới
+                    <span id="badge-new-reg" class="px-2 py-0.5 text-[11px] rounded-full bg-amber-500 text-slate-950 font-extrabold">0</span>
+                </button>
+                <button id="adm-tab-btn-app" onclick="switchAdminTab('app')" class="py-3.5 px-5 text-sm font-semibold text-slate-600 hover:text-blue-900 whitespace-nowrap flex items-center gap-2">
+                    <i class="fa-solid fa-mobile-screen"></i> 4. Cài đặt App 600 Câu & Lịch Thi
+                </button>
+                <button id="adm-tab-btn-settings" onclick="switchAdminTab('settings')" class="py-3.5 px-5 text-sm font-semibold text-slate-600 hover:text-blue-900 whitespace-nowrap flex items-center gap-2">
+                    <i class="fa-solid fa-gear"></i> 5. Cài đặt Văn phòng & Sao lưu
+                </button>
+            </div>
+
+            <!-- TAB 1: QUẢN LÝ HỌC VIÊN -->
+            <div id="adm-panel-students" class="p-5 sm:p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-5">
+                    <div class="relative flex-1 max-w-md">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="adm-search-student" oninput="renderAdminStudents()" placeholder="Tìm theo tên học viên, SĐT, hạng bằng..." class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+                    <button onclick="openStudentModal()" class="px-4 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white text-sm font-bold shadow-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Thêm Học Viên Mới
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 border-b border-slate-200 text-xs font-bold uppercase text-slate-600">
+                                <th class="py-3 px-4">Học Viên & SĐT</th>
+                                <th class="py-3 px-4">Hạng Bằng / Khóa</th>
+                                <th class="py-3 px-4">Tình Trạng Hồ Sơ</th>
+                                <th class="py-3 px-4">Học Phí (Đã đóng / Tổng)</th>
+                                <th class="py-3 px-4">Thầy Giáo Phụ Trách</th>
+                                <th class="py-3 px-4 text-right">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adm-students-tbody" class="divide-y divide-slate-200 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: QUẢN LÝ LỊCH CHẠY & LỊCH DẠY -->
+            <div id="adm-panel-schedules" class="hidden p-5 sm:p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-5">
+                    <div class="flex flex-wrap gap-2.5 flex-1">
+                        <div class="relative flex-1 max-w-xs">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" id="adm-search-schedule" oninput="renderAdminSchedules()" placeholder="Tìm tên học viên, SĐT, thầy giáo..." class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                        </div>
+                        <select id="adm-filter-teacher" onchange="renderAdminSchedules()" class="px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white outline-none">
+                            <option value="ALL">Tất cả thầy giáo</option>
+                        </select>
+                    </div>
+                    <button onclick="openScheduleModal()" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-extrabold shadow-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calendar-plus"></i> Xếp Lịch Chạy / Lịch Dạy Mới
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 border-b border-slate-200 text-xs font-bold uppercase text-slate-600">
+                                <th class="py-3 px-4">Ngày & Ca Học</th>
+                                <th class="py-3 px-4">Học Viên (SĐT)</th>
+                                <th class="py-3 px-4">Thầy Giáo Phụ Trách</th>
+                                <th class="py-3 px-4">Nội Dung Học & Xe</th>
+                                <th class="py-3 px-4">Sân Tập / Địa Điểm</th>
+                                <th class="py-3 px-4 text-right">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adm-schedules-tbody" class="divide-y divide-slate-200 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: HỒ SƠ ĐĂNG KÝ MỚI TỪ TRANG CHỦ -->
+            <div id="adm-panel-registrations" class="hidden p-5 sm:p-6">
+                <div class="mb-4">
+                    <h3 class="text-base font-bold text-slate-900">Danh sách khách hàng đăng ký trực tuyến trên Trang chủ</h3>
+                    <p class="text-xs text-slate-500">Bấm "Duyệt vào Học viên" để chuyển thông tin sang danh sách học viên chính thức và bắt đầu xếp lịch chạy xe.</p>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 border-b border-slate-200 text-xs font-bold uppercase text-slate-600">
+                                <th class="py-3 px-4">Ngày Gửi</th>
+                                <th class="py-3 px-4">Họ Tên & SĐT</th>
+                                <th class="py-3 px-4">Hạng Bằng</th>
+                                <th class="py-3 px-4">Ghi Chú Của Khách</th>
+                                <th class="py-3 px-4 text-right">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adm-registrations-tbody" class="divide-y divide-slate-200 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 4: CÀI ĐẶT APP 600 CÂU & THÔNG BÁO LỊCH THI -->
+            <div id="adm-panel-app" class="hidden p-6 sm:p-8 max-w-3xl">
+                <form onsubmit="saveAppAndNoticeSettings(event)" class="space-y-5">
+                    <div class="border-b border-slate-200 pb-3">
+                        <h3 class="text-lg font-extrabold text-slate-900">Điều Chỉnh Link Tải App Thi 600 Câu GPLX</h3>
+                        <p class="text-xs text-slate-500">Dán đường link tải ứng dụng mới nhất (CH Play, App Store hoặc link Google Drive file APK). Thay đổi sẽ cập nhật ngay trên Trang chủ.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Tiêu đề mục App 600 câu</label>
+                        <input type="text" id="cfg-app-title" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Mô tả giới thiệu App</label>
+                        <textarea id="cfg-app-desc" rows="2" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-emerald-700 mb-1"><i class="fa-brands fa-android mr-1"></i>Link tải Android / APK</label>
+                            <input type="url" id="cfg-app-android" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-blue-700 mb-1"><i class="fa-brands fa-apple mr-1"></i>Link tải iOS (iPhone)</label>
+                            <input type="url" id="cfg-app-ios" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-amber-700 mb-1"><i class="fa-solid fa-desktop mr-1"></i>Link PC / Web Thi Thử</label>
+                            <input type="url" id="cfg-app-pc" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-200 pb-3 pt-4">
+                        <h3 class="text-lg font-extrabold text-slate-900">Thông Báo Lịch Thi Sát Hạch & Ghi Chú Văn Phòng</h3>
+                        <p class="text-xs text-slate-500">Nội dung này hiển thị nổi bật bên cạnh khu vực tải App để học viên nắm lịch thi.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Tiêu đề thông báo thi</label>
+                        <input type="text" id="cfg-notice-title" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Nội dung chi tiết lịch thi / nhắc nhở</label>
+                        <textarea id="cfg-notice-content" rows="4" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800"></textarea>
+                    </div>
+
+                    <button type="submit" class="px-6 py-3 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Lưu & Cập Nhật Lên Trang Chủ
+                    </button>
+                </form>
+            </div>
+
+            <!-- TAB 5: CÀI ĐẶT VĂN PHÒNG, ĐỔI MẬT KHẨU & SAO LƯU -->
+            <div id="adm-panel-settings" class="hidden p-6 sm:p-8 max-w-4xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Form Thông tin Văn phòng & Mật khẩu -->
+                    <form onsubmit="saveOfficeSettings(event)" class="space-y-4">
+                        <h3 class="text-lg font-extrabold text-slate-900 border-b border-slate-200 pb-2">Thông Tin Văn Phòng & Bảo Mật</h3>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Tên Văn Phòng hiển thị</label>
+                            <input type="text" id="cfg-office-name" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Số điện thoại Hotline</label>
+                            <input type="text" id="cfg-office-phone" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Địa chỉ Văn phòng</label>
+                            <input type="text" id="cfg-office-address" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">SĐT Đăng nhập Admin</label>
+                                <input type="tel" id="cfg-admin-phone" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono outline-none focus:border-blue-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Mật khẩu Admin</label>
+                                <input type="text" id="cfg-admin-pass" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono outline-none focus:border-blue-800">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm shadow-sm transition">
+                            <i class="fa-solid fa-check mr-1.5"></i> Lưu Cài Đặt Văn Phòng
+                        </button>
+                    </form>
+
+                    <!-- Khu vực Sao lưu & Khôi phục dữ liệu -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-extrabold text-slate-900 border-b border-slate-200 pb-2">Sao Lưu & Chuyển Dữ Liệu Máy Khác</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Toàn bộ danh sách học viên, lịch chạy xe và cấu hình được lưu trực tiếp trên trình duyệt hiện tại. Bạn có thể xuất file sao lưu để lưu trữ hoặc nạp sang máy tính/điện thoại khác.
+                        </p>
+
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                            <button type="button" onclick="exportBackupJSON()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-download"></i> Xuất File Dữ Liệu Sao Lưu (.json)
+                            </button>
+
+                            <div>
+                                <label class="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                                    <i class="fa-solid fa-upload text-blue-700"></i> Nạp Dữ Liệu Từ File (.json)
+                                    <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="button" onclick="resetToDefaultData()" class="w-full py-2.5 px-4 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-rotate-left"></i> Khôi phục toàn bộ về dữ liệu mẫu ban đầu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 text-slate-400 py-10 mt-14 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+            <div class="flex items-center gap-2.5 text-white font-bold text-sm">
+                <i class="fa-solid fa-car-side text-amber-400"></i>
+                <span id="footer-office-name">Văn Phòng Tiếp Nhận Hồ Sơ Bằng Lái Tuấn Anh</span>
+            </div>
+            <div class="text-center md:text-right">
+                <p id="footer-address">Số 86 Đường Giải Phóng, Quận Hoàng Mai, Hà Nội</p>
+                <p class="mt-1">&copy; 2026 Hệ thống Quản lý Đào tạo & Tra cứu Lịch học Lái xe.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===================================================================== -->
+    <!-- CÁC HỘP THOẠI MODAL (ĐĂNG NHẬP ADMIN, THÊM/SỬA HỌC VIÊN, THÊM LỊCH)   -->
+    <!-- ===================================================================== -->
+
+    <!-- 1. MODAL ĐĂNG NHẬP ADMIN (Sạch sẽ, không có nút demo) -->
+    <div id="admin-login-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden fade-in">
+            <div class="bg-blue-950 p-6 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-extrabold flex items-center gap-2">
+                        <i class="fa-solid fa-user-shield text-amber-400"></i> Đăng Nhập Quản Trị Viên
+                    </h3>
+                    <p class="text-xs text-blue-200 mt-0.5">Dành riêng cho cán bộ quản lý văn phòng</p>
+                </div>
+                <button onclick="closeModal('admin-login-modal')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">Số điện thoại Admin</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-phone absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="tel" id="login-admin-phone" required placeholder="Nhập số điện thoại..." class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-blue-800 focus:ring-2 focus:ring-blue-800/15 outline-none text-sm font-semibold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">Mật khẩu</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="password" id="login-admin-password" required placeholder="Nhập mật khẩu..." class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-blue-800 focus:ring-2 focus:ring-blue-800/15 outline-none text-sm font-semibold">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-extrabold text-sm shadow-md transition">
+                    Đăng Nhập Hệ Thống
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. MODAL THÊM / SỬA HỌC VIÊN -->
+    <div id="student-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden fade-in">
+            <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+                <h3 id="student-modal-title" class="text-base font-extrabold">Thêm Học Viên Mới</h3>
+                <button onclick="closeModal('student-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="saveStudent(event)" class="p-6 space-y-4">
+                <input type="hidden" id="stu-edit-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Họ và tên học viên <span class="text-red-500">*</span></label>
+                        <input type="text" id="stu-name" required placeholder="VD: Nguyễn Văn An" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại (Mã tra cứu) <span class="text-red-500">*</span></label>
+                        <input type="tel" id="stu-phone" required placeholder="VD: 0987654321" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono outline-none focus:border-blue-800">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Hạng bằng đăng ký</label>
+                        <select id="stu-license" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white outline-none focus:border-blue-800">
+                            <option value="Hạng B2 (Số sàn)">Hạng B2 (Số sàn)</option>
+                            <option value="Hạng B1 (Số tự động)">Hạng B1 (Số tự động)</option>
+                            <option value="Hạng C (Xe tải)">Hạng C (Xe tải)</option>
+                            <option value="Hạng A1">Hạng A1</option>
+                            <option value="Hạng A2">Hạng A2</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Mã khóa học</label>
+                        <input type="text" id="stu-course" required placeholder="VD: K26-B2" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Tình trạng hồ sơ</label>
+                        <select id="stu-status" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white outline-none focus:border-blue-800">
+                            <option value="Đang học thực hành">Đang học thực hành</option>
+                            <option value="Đang học lý thuyết">Đang học lý thuyết</option>
+                            <option value="Đã hoàn thiện hồ sơ">Đã hoàn thiện hồ sơ</option>
+                            <option value="Chờ thi sát hạch">Chờ thi sát hạch</option>
+                            <option value="Đã thi đỗ">Đã thi đỗ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Thầy giáo hướng dẫn</label>
+                        <input type="text" id="stu-teacher" list="teacher-datalist" required placeholder="VD: Thầy Nguyễn Văn Hùng" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Học phí đã đóng</label>
+                        <input type="text" id="stu-fee-paid" required placeholder="VD: 10.000.000đ" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Tổng học phí khóa</label>
+                        <input type="text" id="stu-fee-total" required placeholder="VD: 14.500.000đ" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2.5 pt-2">
+                    <button type="button" onclick="closeModal('student-modal')" class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-600 hover:bg-slate-50">Hủy</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white text-sm font-bold">Lưu Học Viên</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. MODAL THÊM / SỬA LỊCH CHẠY & LỊCH DẠY -->
+    <div id="schedule-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden fade-in">
+            <div class="bg-slate-900 p-5 text-white flex justify-between items-center">
+                <h3 id="schedule-modal-title" class="text-base font-extrabold">Xếp Lịch Chạy / Lịch Dạy Mới</h3>
+                <button onclick="closeModal('schedule-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="saveSchedule(event)" class="p-6 space-y-4">
+                <input type="hidden" id="sch-edit-id">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Chọn Học Viên <span class="text-red-500">*</span></label>
+                    <select id="sch-student-phone" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white outline-none focus:border-blue-800 font-medium"></select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Thầy giáo dạy <span class="text-red-500">*</span></label>
+                        <input type="text" id="sch-teacher" list="teacher-datalist" required placeholder="VD: Thầy Nguyễn Văn Hùng" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Biển số xe tập lái</label>
+                        <input type="text" id="sch-car" required placeholder="VD: 30G-456.78 (Vios)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ngày học <span class="text-red-500">*</span></label>
+                        <input type="text" id="sch-date" required placeholder="VD: Thứ 4, 18/11/2026" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Giờ / Ca học <span class="text-red-500">*</span></label>
+                        <input type="text" id="sch-time" required placeholder="VD: 07:30 - 11:30 (Ca sáng)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nội dung học <span class="text-red-500">*</span></label>
+                    <input type="text" id="sch-content" required placeholder="VD: Thực hành sa hình 11 bài liên hoàn" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Địa điểm / Sân tập <span class="text-red-500">*</span></label>
+                    <input type="text" id="sch-location" required placeholder="VD: Sân sát hạch Ngọc Hồi - Thanh Trì" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-blue-800">
+                </div>
+
+                <div class="flex justify-end gap-2.5 pt-2">
+                    <button type="button" onclick="closeModal('schedule-modal')" class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-600 hover:bg-slate-50">Hủy</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-extrabold">Lưu Lịch Chạy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- JAVASCRIPT XỬ LÝ DỮ LIỆU & TƯƠNG TÁC                                  -->
+    <!-- ===================================================================== -->
+    <script>
+        // --- 1. DỮ LIỆU MẪU KHỞI TẠO BAN ĐẦU ---
+        const DEFAULT_SETTINGS = {
+            officeName: 'Văn Phòng Tiếp Nhận Hồ Sơ Bằng Lái Tuấn Anh',
+            phone: '0901.234.567',
+            address: 'Số 86 Đường Giải Phóng, Quận Hoàng Mai, Hà Nội',
+            adminPhone: '0901234567',
+            adminPass: '123456',
+            appTitle: 'Tải App Ôn Thi Trắc Nghiệm GPLX 600 Câu Hỏi & Mô Phỏng',
+            appDesc: 'Bộ đề thi thử ngẫu nhiên chuẩn cấu trúc sát hạch mới nhất cho các hạng A1, A2, B1, B2, C. Tích hợp riêng danh sách 60 câu điểm liệt, mẹo ghi nhớ biển báo và giải thích đáp án chi tiết.',
+            appAndroid: 'https://play.google.com/store',
+            appIos: 'https://apps.apple.com',
+            appPc: 'https://daotaolaixe.gov.vn',
+            noticeTitle: 'Lịch Thi Sát Hạch & Ôn Xe Chip Tháng 11/2026',
+            noticeContent: '• Khóa B1 & B2 K24: Thi tốt nghiệp ngày 22/11/2026 tại Sân sát hạch Ngọc Hồi.\n• Lịch ghép xe chip cảm ứng: Đăng ký trực tiếp với Thầy phụ trách hoặc gọi Hotline văn phòng trước 3 ngày.\n• Học viên đi thi nhớ mang theo CCCD bản gốc còn hạn sử dụng và có mặt trước 07:00 sáng.'
+        };
+
+        const DEFAULT_STUDENTS = [
+            { id: 'ST01', name: 'Nguyễn Văn An', phone: '0987654321', license: 'Hạng B2 (Số sàn)', course: 'K26-B2', status: 'Đang học thực hành', teacher: 'Thầy Nguyễn Văn Hùng', feePaid: '11.000.000đ', feeTotal: '14.500.000đ' },
+            { id: 'ST02', name: 'Trần Thị Bình', phone: '0971112222', license: 'Hạng B1 (Số tự động)', course: 'K26-B1', status: 'Đang học thực hành', teacher: 'Thầy Trần Quốc Tuấn', feePaid: '14.000.000đ', feeTotal: '14.000.000đ' },
+            { id: 'ST03', name: 'Lê Hoàng Nam', phone: '0963334444', license: 'Hạng C (Xe tải)', course: 'K18-C', status: 'Chờ thi sát hạch', teacher: 'Thầy Lê Đình Phong', feePaid: '17.500.000đ', feeTotal: '17.500.000đ' },
+            { id: 'ST04', name: 'Phạm Minh Châu', phone: '0915556666', license: 'Hạng A1', course: 'A1-T11', status: 'Đã hoàn thiện hồ sơ', teacher: 'Thầy Nguyễn Văn Hùng', feePaid: '750.000đ', feeTotal: '750.000đ' }
+        ];
+
+        const DEFAULT_SCHEDULES = [
+            { id: 'SC01', studentPhone: '0987654321', teacher: 'Thầy Nguyễn Văn Hùng', car: '30G-456.78 (Toyota Vios)', date: 'Thứ 4, 18/11/2026', time: '07:30 - 11:30 (Ca sáng)', content: 'Thực hành sa hình 11 bài liên hoàn & ghép xe dọc', location: 'Sân sát hạch Ngọc Hồi - Thanh Trì' },
+            { id: 'SC02', studentPhone: '0987654321', teacher: 'Thầy Nguyễn Văn Hùng', car: '30G-456.78 (Toyota Vios)', date: 'Thứ 7, 21/11/2026', time: '13:30 - 17:30 (Ca chiều)', content: 'Chạy đường trường DAT 150km tuyến Pháp Vân', location: 'Cổng Văn Phòng 86 Giải Phóng' },
+            { id: 'SC03', studentPhone: '0971112222', teacher: 'Thầy Trần Quốc Tuấn', car: '30H-889.12 (Accent AT)', date: 'Thứ 5, 19/11/2026', time: '08:00 - 11:30 (Ca sáng)', content: 'Tập đề-pa lên dốc & lùi chuồng ngang', location: 'Sân tập lái Sài Đồng - Long Biên' },
+            { id: 'SC04', studentPhone: '0963334444', teacher: 'Thầy Lê Đình Phong', car: '29C-771.09 (Xe tải JAC)', date: 'Thứ 6, 20/11/2026', time: '07:00 - 11:30 (Ca sáng)', content: 'Ôn xe chip cảm ứng tổng hợp trước kỳ thi', location: 'Trung tâm Sát hạch Đức Thịnh' },
+            { id: 'SC05', studentPhone: '0915556666', teacher: 'Thầy Nguyễn Văn Hùng', car: 'Sân vòng số 8', date: 'Chủ nhật, 22/11/2026', time: '14:00 - 16:30 (Ca chiều)', content: 'Tập vòng số 8 & đường gồ ghề hạng A1', location: 'Sân tập 86 Giải Phóng' }
+        ];
+
+        const DEFAULT_REGISTRATIONS = [
+            { id: 'RG01', date: '16/11/2026', name: 'Đặng Quốc Việt', phone: '0934567890', license: 'Hạng B2 (Số sàn)', note: 'Muốn đăng ký khóa khai giảng tuần này, học thực hành cuối tuần.' }
+        ];
+
+        // --- 2. QUẢN LÝ STATE LƯU TRỮ TRONG LOCALSTORAGE ---
+        const STORAGE_KEY = 'tuan_anh_driving_office_v1';
+        let appState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+            settings: { ...DEFAULT_SETTINGS },
+            students: [...DEFAULT_STUDENTS],
+            schedules: [...DEFAULT_SCHEDULES],
+            registrations: [...DEFAULT_REGISTRATIONS]
+        };
+        let isAdminLoggedIn = sessionStorage.getItem('tuan_anh_admin_auth') === 'true';
+
+        function persistState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        }
+
+        // --- 3. KHỞI TẠO TRANG KHI TẢI XONG ---
+        window.onload = function() {
+            applyDynamicSettingsToUI();
+            populateTeacherSuggestions();
+            updateAuthButtons();
+        };
+
+        // --- 4. HỆ THỐNG THÔNG BÁO TOAST & CONFIRM ---
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            const styles = {
+                success: 'bg-emerald-600 text-white border-emerald-700',
+                error: 'bg-red-600 text-white border-red-700',
+                info: 'bg-blue-900 text-white border-blue-950'
+            };
+            const icons = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-exclamation',
+                info: 'fa-circle-info'
+            };
+            el.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border text-sm font-semibold transition-all duration-300 translate-x-full ${styles[type] || styles.info}`;
+            el.innerHTML = `<i class="fa-solid ${icons[type]}"></i><span>${msg}</span>`;
+            container.appendChild(el);
+            requestAnimationFrame(() => el.classList.remove('translate-x-full'));
+            setTimeout(() => {
+                el.classList.add('opacity-0', 'translate-x-full');
+                setTimeout(() => el.remove(), 300);
+            }, 3500);
+        }
+
+        function showConfirm(title, message, onOk) {
+            const modal = document.getElementById('confirm-modal');
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-message').textContent = message;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const close = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+            document.getElementById('confirm-cancel').onclick = close;
+            document.getElementById('confirm-ok').onclick = () => { close(); onOk(); };
+        }
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // --- 5. ĐỒNG BỘ CẤU HÌNH ADMIN RA GIAO DIỆN CÔNG KHAI ---
+        function applyDynamicSettingsToUI() {
+            const s = appState.settings;
+            document.title = s.officeName;
+            document.getElementById('header-office-name').textContent = s.officeName;
+            document.getElementById('footer-office-name').textContent = s.officeName;
+            document.getElementById('topbar-address').textContent = s.address;
+            document.getElementById('hero-address').textContent = s.address;
+            document.getElementById('footer-address').textContent = s.address;
+
+            document.getElementById('topbar-phone').textContent = s.phone;
+            document.getElementById('hero-phone').textContent = s.phone;
+            const cleanTel = 'tel:' + s.phone.replace(/[^0-9]/g, '');
+            document.getElementById('topbar-phone-link').href = cleanTel;
+            document.getElementById('notice-call-btn').href = cleanTel;
+
+            // App 600 câu & Thông báo lịch thi
+            document.getElementById('app-section-title').textContent = s.appTitle;
+            document.getElementById('app-section-desc').textContent = s.appDesc;
+            document.getElementById('link-app-android').href = s.appAndroid;
+            document.getElementById('link-app-ios').href = s.appIos;
+            document.getElementById('link-app-pc').href = s.appPc;
+
+            document.getElementById('exam-notice-title').textContent = s.noticeTitle;
+            document.getElementById('exam-notice-content').textContent = s.noticeContent;
+        }
+
+        function getUniqueTeachers() {
+            const set = new Set();
+            appState.students.forEach(st => { if (st.teacher) set.add(st.teacher.trim()); });
+            appState.schedules.forEach(sc => { if (sc.teacher) set.add(sc.teacher.trim()); });
+            return Array.from(set);
+        }
+
+        function populateTeacherSuggestions() {
+            const teachers = getUniqueTeachers();
+            const datalist = document.getElementById('teacher-datalist');
+            datalist.innerHTML = teachers.map(t => `<option value="${t}">`).join('');
+
+            const pills = document.getElementById('quick-teacher-pills');
+            if (teachers.length > 0) {
+                pills.innerHTML = `<span class="text-xs text-slate-500">Chọn nhanh:</span>` + teachers.map(t => `
+                    <button type="button" onclick="quickSelectTeacher('${t}')" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-900 text-xs font-semibold border border-slate-200 transition">
+                        ${t}
+                    </button>
+                `).join('');
+            }
+        }
+
+        // --- 6. TRA CỨU HỌC VIÊN & THẦY GIÁO (KHÔNG CẦN ĐĂNG NHẬP) ---
+        function switchLookupTab(tab) {
+            const btnStu = document.getElementById('lookup-tab-student');
+            const btnTea = document.getElementById('lookup-tab-teacher');
+            const panelStu = document.getElementById('lookup-panel-student');
+            const panelTea = document.getElementById('lookup-panel-teacher');
+
+            if (tab === 'student') {
+                btnStu.className = 'py-4 px-4 sm:px-6 text-sm sm:text-base font-extrabold flex items-center justify-center gap-2.5 bg-white text-blue-900 border-t-4 border-amber-500 transition';
+                btnTea.className = 'py-4 px-4 sm:px-6 text-sm sm:text-base font-bold flex items-center justify-center gap-2.5 text-slate-600 hover:text-blue-900 hover:bg-slate-50 border-t-4 border-transparent transition';
+                panelStu.classList.remove('hidden');
+                panelTea.classList.add('hidden');
+            } else {
+                btnTea.className = 'py-4 px-4 sm:px-6 text-sm sm:text-base font-extrabold flex items-center justify-center gap-2.5 bg-white text-blue-900 border-t-4 border-amber-500 transition';
+                btnStu.className = 'py-4 px-4 sm:px-6 text-sm sm:text-base font-bold flex items-center justify-center gap-2.5 text-slate-600 hover:text-blue-900 hover:bg-slate-50 border-t-4 border-transparent transition';
+                panelTea.classList.remove('hidden');
+                panelStu.classList.add('hidden');
+                populateTeacherSuggestions();
+            }
+        }
+
+        function handleStudentLookup(e) {
+            e.preventDefault();
+            const phone = document.getElementById('input-student-phone').value.replace(/\s+/g, '').trim();
+            const resultBox = document.getElementById('student-lookup-result');
+            const student = appState.students.find(s => s.phone.replace(/\s+/g, '') === phone);
+
+            resultBox.classList.remove('hidden');
+
+            if (!student) {
+                resultBox.innerHTML = `
+                    <div class="max-w-xl mx-auto p-5 rounded-2xl bg-red-50 border border-red-200 text-center">
+                        <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-3 text-xl">
+                            <i class="fa-solid fa-phone-slash"></i>
+                        </div>
+                        <h3 class="text-base font-extrabold text-red-800">Không tìm thấy hồ sơ với SĐT "${phone}"</h3>
+                        <p class="text-xs text-red-700 mt-1.5 leading-relaxed">
+                            Vui lòng kiểm tra lại số điện thoại hoặc liên hệ trực tiếp Văn phòng qua Hotline <strong>${appState.settings.phone}</strong> để được cập nhật lên hệ thống.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            const studentSchedules = appState.schedules.filter(sc => sc.studentPhone.replace(/\s+/g, '') === phone);
+
+            resultBox.innerHTML = `
+                <div class="border-2 border-blue-900/15 rounded-2xl bg-slate-50/70 p-5 sm:p-7">
+                    <!-- Thẻ thông tin hồ sơ học viên -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-md bg-blue-900 text-amber-400 text-xs font-extrabold uppercase">${student.license} • Khóa ${student.course}</span>
+                            <h3 class="text-2xl font-extrabold text-slate-900 mt-2">${student.name}</h3>
+                            <p class="text-sm text-slate-600 mt-0.5">Số điện thoại: <strong class="font-mono text-slate-900">${student.phone}</strong></p>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <div class="bg-white px-4 py-2.5 rounded-xl border border-slate-200">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase block">Tình trạng hồ sơ</span>
+                                <span class="text-sm font-extrabold text-emerald-700"><i class="fa-solid fa-circle-check mr-1"></i>${student.status}</span>
+                            </div>
+                            <div class="bg-white px-4 py-2.5 rounded-xl border border-slate-200">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase block">Học phí đã đóng</span>
+                                <span class="text-sm font-extrabold text-blue-900">${student.feePaid} / ${student.feeTotal}</span>
+                            </div>
+                            <div class="bg-white px-4 py-2.5 rounded-xl border border-slate-200">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase block">Thầy giáo hướng dẫn</span>
+                                <span class="text-sm font-extrabold text-amber-700">${student.teacher}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bảng Lịch Học Chi Tiết -->
+                    <div class="mt-5">
+                        <h4 class="text-sm font-extrabold uppercase tracking-wider text-blue-950 mb-3 flex items-center gap-2">
+                            <i class="fa-regular fa-calendar-days text-amber-600"></i> Lịch Học Thực Hành & Sa Hình Của Bạn (${studentSchedules.length} buổi)
+                        </h4>
+                        ${studentSchedules.length === 0 ? `
+                            <div class="p-4 rounded-xl bg-white border border-slate-200 text-sm text-slate-500 text-center">
+                                Hiện chưa có lịch chạy xe mới được xếp. Văn phòng sẽ cập nhật và thông báo sớm cho bạn.
+                            </div>
+                        ` : `
+                            <div class="overflow-x-auto bg-white rounded-xl border border-slate-200">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-100 border-b border-slate-200 text-xs font-bold uppercase text-slate-600">
+                                            <th class="py-3 px-4">Ngày Học</th>
+                                            <th class="py-3 px-4">Giờ / Ca Học</th>
+                                            <th class="py-3 px-4">Nội Dung Học</th>
+                                            <th class="py-3 px-4">Thầy Giáo & Xe</th>
+                                            <th class="py-3 px-4">Sân Tập / Địa Điểm</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 text-sm">
+                                        ${studentSchedules.map(sc => `
+                                            <tr class="hover:bg-blue-50/40">
+                                                <td class="py-3 px-4 font-bold text-blue-950 whitespace-nowrap">${sc.date}</td>
+                                                <td class="py-3 px-4 font-semibold text-amber-700 whitespace-nowrap">${sc.time}</td>
+                                                <td class="py-3 px-4 font-medium text-slate-800">${sc.content}</td>
+                                                <td class="py-3 px-4">
+                                                    <div class="font-bold text-slate-900">${sc.teacher}</div>
+                                                    <div class="text-xs text-slate-500 font-mono">${sc.car}</div>
+                                                </td>
+                                                <td class="py-3 px-4 text-slate-600"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i>${sc.location}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        function quickSelectTeacher(teacherName) {
+            document.getElementById('input-teacher-name').value = teacherName;
+            handleTeacherLookup(new Event('submit'));
+        }
+
+        function handleTeacherLookup(e) {
+            e.preventDefault();
+            const query = document.getElementById('input-teacher-name').value.toLowerCase().trim();
+            const resultBox = document.getElementById('teacher-lookup-result');
+            resultBox.classList.remove('hidden');
+
+            const matchedSchedules = appState.schedules.filter(sc => sc.teacher.toLowerCase().includes(query));
+            const matchedStudents = appState.students.filter(st => st.teacher.toLowerCase().includes(query));
+
+            if (matchedSchedules.length === 0 && matchedStudents.length === 0) {
+                resultBox.innerHTML = `
+                    <div class="max-w-xl mx-auto p-5 rounded-2xl bg-amber-50 border border-amber-200 text-center">
+                        <h3 class="text-base font-extrabold text-amber-900">Không tìm thấy lịch dạy cho tên "${document.getElementById('input-teacher-name').value}"</h3>
+                        <p class="text-xs text-amber-800 mt-1">Vui lòng nhập đúng tên thầy giáo hoặc bấm chọn nhanh tên trong danh sách gợi ý phía trên.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const teacherFullName = matchedSchedules[0]?.teacher || matchedStudents[0]?.teacher;
+
+            resultBox.innerHTML = `
+                <div class="border-2 border-amber-500/30 rounded-2xl bg-slate-50/70 p-5 sm:p-7">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
+                        <div>
+                            <span class="px-2.5 py-0.5 rounded-md bg-amber-500 text-slate-950 text-xs font-extrabold uppercase">Lịch Giảng Dạy Giáo Viên</span>
+                            <h3 class="text-2xl font-extrabold text-slate-900 mt-1.5">${teacherFullName}</h3>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 text-center">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase block">Buổi dạy sắp tới</span>
+                                <span class="text-lg font-extrabold text-blue-900">${matchedSchedules.length}</span>
+                            </div>
+                            <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 text-center">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase block">Học viên phụ trách</span>
+                                <span class="text-lg font-extrabold text-emerald-700">${matchedStudents.length}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <h4 class="text-sm font-extrabold uppercase tracking-wider text-slate-800 mb-3">
+                            <i class="fa-solid fa-car text-blue-800 mr-1.5"></i>Chi Tiết Lịch Dạy & Học Viên Từng Buổi
+                        </h4>
+                        ${matchedSchedules.length === 0 ? `
+                            <p class="text-sm text-slate-500 bg-white p-4 rounded-xl border border-slate-200">Hiện chưa có lịch chạy xe cụ thể được xếp cho giáo viên này.</p>
+                        ` : `
+                            <div class="overflow-x-auto bg-white rounded-xl border border-slate-200">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-100 border-b border-slate-200 text-xs font-bold uppercase text-slate-600">
+                                            <th class="py-3 px-4">Ngày & Ca Dạy</th>
+                                            <th class="py-3 px-4">Học Viên Tham Gia</th>
+                                            <th class="py-3 px-4">SĐT Học Viên</th>
+                                            <th class="py-3 px-4">Nội Dung & Xe Tập</th>
+                                            <th class="py-3 px-4">Địa Điểm</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 text-sm">
+                                        ${matchedSchedules.map(sc => {
+                                            const stu = appState.students.find(s => s.phone === sc.studentPhone);
+                                            return `
+                                                <tr class="hover:bg-amber-50/40">
+                                                    <td class="py-3 px-4">
+                                                        <div class="font-bold text-slate-900">${sc.date}</div>
+                                                        <div class="text-xs font-bold text-amber-700">${sc.time}</div>
+                                                    </td>
+                                                    <td class="py-3 px-4">
+                                                        <div class="font-extrabold text-blue-950">${stu ? stu.name : 'Học viên'}</div>
+                                                        <div class="text-xs text-slate-500">${stu ? stu.license : ''}</div>
+                                                    </td>
+                                                    <td class="py-3 px-4 font-mono font-bold text-slate-800">
+                                                        <a href="tel:${sc.studentPhone}" class="hover:text-blue-700 underline">${sc.studentPhone}</a>
+                                                    </td>
+                                                    <td class="py-3 px-4">
+                                                        <div class="font-medium text-slate-800">${sc.content}</div>
+                                                        <div class="text-xs text-slate-500 font-mono">${sc.car}</div>
+                                                    </td>
+                                                    <td class="py-3 px-4 text-slate-600">${sc.location}</td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 7. ĐĂNG KÝ HỒ SƠ MỚI TỪ TRANG CHỦ ---
+        function submitNewRegistration(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-fullname').value.trim();
+            const phone = document.getElementById('reg-phone').value.replace(/\s+/g, '').trim();
+            const license = document.getElementById('reg-license').value;
+            const note = document.getElementById('reg-note').value.trim() || 'Đăng ký trực tuyến qua Website';
+
+            appState.registrations.unshift({
+                id: 'RG' + Date.now(),
+                date: new Date().toLocaleDateString('vi-VN'),
+                name,
+                phone,
+                license,
+                note
+            });
+            persistState();
+            e.target.reset();
+            showToast('Gửi hồ sơ thành công! Văn phòng Tuấn Anh sẽ gọi xác nhận lịch học cho bạn.');
+        }
+
+        // --- 8. XÁC THỰC & ĐIỀU HƯỚNG ADMIN ---
+        function openAdminLoginModal() {
+            document.getElementById('admin-login-modal').classList.remove('hidden');
+            document.getElementById('admin-login-modal').classList.add('flex');
+            document.getElementById('login-admin-phone').focus();
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const phone = document.getElementById('login-admin-phone').value.trim();
+            const pass = document.getElementById('login-admin-password').value.trim();
+
+            if (phone === appState.settings.adminPhone && pass === appState.settings.adminPass) {
+                isAdminLoggedIn = true;
+                sessionStorage.setItem('tuan_anh_admin_auth', 'true');
+                closeModal('admin-login-modal');
+                updateAuthButtons();
+                showAdminView();
+                showToast('Đăng nhập quyền Quản trị viên thành công!');
+            } else {
+                showToast('Sai số điện thoại hoặc mật khẩu Admin!', 'error');
+            }
+        }
+
+        function adminLogout() {
+            isAdminLoggedIn = false;
+            sessionStorage.removeItem('tuan_anh_admin_auth');
+            updateAuthButtons();
+            showPublicView();
+            showToast('Đã đăng xuất khỏi trang quản trị', 'info');
+        }
+
+        function updateAuthButtons() {
+            const loginBtn = document.getElementById('btn-admin-login');
+            const loggedBox = document.getElementById('admin-logged-actions');
+            if (isAdminLoggedIn) {
+                loginBtn.classList.add('hidden');
+                loggedBox.classList.remove('hidden');
+                loggedBox.classList.add('flex');
+            } else {
+                loginBtn.classList.remove('hidden');
+                loggedBox.classList.add('hidden');
+                loggedBox.classList.remove('flex');
+            }
+        }
+
+        function showPublicView() {
+            document.getElementById('admin-view').classList.add('hidden');
+            document.getElementById('public-view').classList.remove('hidden');
+            applyDynamicSettingsToUI();
+            populateTeacherSuggestions();
+        }
+
+        function showAdminView() {
+            if (!isAdminLoggedIn) {
+                openAdminLoginModal();
+                return;
+            }
+            document.getElementById('public-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.remove('hidden');
+            refreshAdminDashboard();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 9. CÁC CHỨC NĂNG TRONG BẢNG ĐIỀU KHIỂN ADMIN ---
+        function switchAdminTab(tab) {
+            const tabs = ['students', 'schedules', 'registrations', 'app', 'settings'];
+            tabs.forEach(t => {
+                document.getElementById(`adm-panel-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`adm-tab-btn-${t}`);
+                btn.className = 'py-3.5 px-5 text-sm font-semibold text-slate-600 hover:text-blue-900 whitespace-nowrap flex items-center gap-2';
+            });
+
+            document.getElementById(`adm-panel-${tab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`adm-tab-btn-${tab}`);
+            activeBtn.className = 'py-3.5 px-5 text-sm font-extrabold text-blue-900 border-b-4 border-blue-900 bg-white whitespace-nowrap flex items-center gap-2';
+        }
+
+        function refreshAdminDashboard() {
+            document.getElementById('stat-students').textContent = appState.students.length;
+            document.getElementById('stat-schedules').textContent = appState.schedules.length;
+            document.getElementById('stat-pending').textContent = appState.registrations.length;
+            document.getElementById('badge-new-reg').textContent = appState.registrations.length;
+
+            renderAdminStudents();
+            renderAdminSchedules();
+            renderAdminRegistrations();
+            loadSettingsForms();
+        }
+
+        // 9.1 Quản lý Học viên
+        function renderAdminStudents() {
+            const tbody = document.getElementById('adm-students-tbody');
+            const q = document.getElementById('adm-search-student').value.toLowerCase().trim();
+            const list = appState.students.filter(s =>
+                !q || s.name.toLowerCase().includes(q) || s.phone.includes(q) || s.license.toLowerCase().includes(q)
+            );
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">Không tìm thấy học viên nào.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(st => `
+                <tr class="hover:bg-slate-50">
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-slate-900">${st.name}</div>
+                        <div class="text-xs font-mono font-semibold text-blue-800">${st.phone}</div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-slate-800">${st.license}</div>
+                        <div class="text-xs text-slate-500">Khóa: ${st.course}</div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${st.status}</span>
+                    </td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">${st.feePaid} / <span class="text-slate-500">${st.feeTotal}</span></td>
+                    <td class="py-3 px-4 font-semibold text-amber-700">${st.teacher}</td>
+                    <td class="py-3 px-4 text-right whitespace-nowrap">
+                        <button onclick="openStudentModal('${st.id}')" title="Sửa thông tin" class="p-2 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-800 mr-1 transition">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deleteStudent('${st.id}')" title="Xóa học viên" class="p-2 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-700 hover:text-red-600 transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openStudentModal(id = null) {
+            populateTeacherSuggestions();
+            if (id) {
+                const st = appState.students.find(x => x.id === id);
+                document.getElementById('student-modal-title').textContent = 'Cập Nhật Hồ Sơ Học Viên';
+                document.getElementById('stu-edit-id').value = st.id;
+                document.getElementById('stu-name').value = st.name;
+                document.getElementById('stu-phone').value = st.phone;
+                document.getElementById('stu-license').value = st.license;
+                document.getElementById('stu-course').value = st.course;
+                document.getElementById('stu-status').value = st.status;
+                document.getElementById('stu-teacher').value = st.teacher;
+                document.getElementById('stu-fee-paid').value = st.feePaid;
+                document.getElementById('stu-fee-total').value = st.feeTotal;
+            } else {
+                document.getElementById('student-modal-title').textContent = 'Thêm Học Viên Mới';
+                document.getElementById('stu-edit-id').value = '';
+                document.getElementById('stu-name').value = '';
+                document.getElementById('stu-phone').value = '';
+                document.getElementById('stu-license').value = 'Hạng B2 (Số sàn)';
+                document.getElementById('stu-course').value = 'K26-B2';
+                document.getElementById('stu-status').value = 'Đang học thực hành';
+                document.getElementById('stu-teacher').value = 'Thầy Nguyễn Văn Hùng';
+                document.getElementById('stu-fee-paid').value = '7.000.000đ';
+                document.getElementById('stu-fee-total').value = '14.500.000đ';
+            }
+            const m = document.getElementById('student-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function saveStudent(e) {
+            e.preventDefault();
+            const id = document.getElementById('stu-edit-id').value;
+            const phone = document.getElementById('stu-phone').value.replace(/\s+/g, '').trim();
+            const payload = {
+                name: document.getElementById('stu-name').value.trim(),
+                phone,
+                license: document.getElementById('stu-license').value,
+                course: document.getElementById('stu-course').value.trim(),
+                status: document.getElementById('stu-status').value,
+                teacher: document.getElementById('stu-teacher').value.trim(),
+                feePaid: document.getElementById('stu-fee-paid').value.trim(),
+                feeTotal: document.getElementById('stu-fee-total').value.trim()
+            };
+
+            if (id) {
+                const idx = appState.students.findIndex(x => x.id === id);
+                appState.students[idx] = { ...appState.students[idx], ...payload };
+                showToast('Đã cập nhật thông tin học viên!');
+            } else {
+                if (appState.students.some(x => x.phone === phone)) {
+                    showToast('Số điện thoại học viên này đã tồn tại!', 'error');
+                    return;
+                }
+                appState.students.unshift({ id: 'ST' + Date.now(), ...payload });
+                showToast('Đã thêm học viên mới thành công!');
+            }
+            persistState();
+            closeModal('student-modal');
+            refreshAdminDashboard();
+        }
+
+        function deleteStudent(id) {
+            showConfirm('Xóa học viên', 'Bạn có chắc chắn muốn xóa học viên này khỏi danh sách?', () => {
+                appState.students = appState.students.filter(x => x.id !== id);
+                persistState();
+                refreshAdminDashboard();
+                showToast('Đã xóa học viên', 'info');
+            });
+        }
+
+        // 9.2 Quản lý Lịch chạy & Lịch dạy
+        function renderAdminSchedules() {
+            const tbody = document.getElementById('adm-schedules-tbody');
+            const q = document.getElementById('adm-search-schedule').value.toLowerCase().trim();
+            const teacherFilter = document.getElementById('adm-filter-teacher').value;
+
+            // Cập nhật dropdown lọc thầy giáo
+            const filterSelect = document.getElementById('adm-filter-teacher');
+            const currentVal = filterSelect.value;
+            const teachers = getUniqueTeachers();
+            filterSelect.innerHTML = `<option value="ALL">Tất cả thầy giáo</option>` + teachers.map(t => `<option value="${t}">${t}</option>`).join('');
+            filterSelect.value = teachers.includes(currentVal) ? currentVal : 'ALL';
+
+            const list = appState.schedules.filter(sc => {
+                const stu = appState.students.find(s => s.phone === sc.studentPhone);
+                const stuName = stu ? stu.name.toLowerCase() : '';
+                const matchQ = !q || stuName.includes(q) || sc.studentPhone.includes(q) || sc.teacher.toLowerCase().includes(q) || sc.content.toLowerCase().includes(q);
+                const matchT = filterSelect.value === 'ALL' || sc.teacher === filterSelect.value;
+                return matchQ && matchT;
+            });
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">Chưa có lịch chạy xe nào phù hợp.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(sc => {
+                const stu = appState.students.find(s => s.phone === sc.studentPhone);
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-slate-900">${sc.date}</div>
+                            <div class="text-xs font-bold text-amber-700">${sc.time}</div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-blue-950">${stu ? stu.name : 'Chưa rõ tên'}</div>
+                            <div class="text-xs font-mono text-slate-500">${sc.studentPhone}</div>
+                        </td>
+                        <td class="py-3 px-4 font-bold text-slate-800">${sc.teacher}</td>
+                        <td class="py-3 px-4">
+                            <div class="text-slate-800 font-medium">${sc.content}</div>
+                            <div class="text-xs text-slate-500 font-mono">${sc.car}</div>
+                        </td>
+                        <td class="py-3 px-4 text-slate-600">${sc.location}</td>
+                        <td class="py-3 px-4 text-right whitespace-nowrap">
+                            <button onclick="openScheduleModal('${sc.id}')" class="p-2 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-800 mr-1 transition">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteSchedule('${sc.id}')" class="p-2 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-700 hover:text-red-600 transition">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openScheduleModal(id = null) {
+            if (appState.students.length === 0) {
+                showToast('Vui lòng thêm ít nhất 1 học viên trước khi xếp lịch!', 'error');
+                return;
+            }
+            populateTeacherSuggestions();
+            const stuSelect = document.getElementById('sch-student-phone');
+            stuSelect.innerHTML = appState.students.map(st => `<option value="${st.phone}">${st.name} - ${st.phone} (${st.license})</option>`).join('');
+
+            if (id) {
+                const sc = appState.schedules.find(x => x.id === id);
+                document.getElementById('schedule-modal-title').textContent = 'Chỉnh Sửa Lịch Chạy Xe';
+                document.getElementById('sch-edit-id').value = sc.id;
+                stuSelect.value = sc.studentPhone;
+                document.getElementById('sch-teacher').value = sc.teacher;
+                document.getElementById('sch-car').value = sc.car;
+                document.getElementById('sch-date').value = sc.date;
+                document.getElementById('sch-time').value = sc.time;
+                document.getElementById('sch-content').value = sc.content;
+                document.getElementById('sch-location').value = sc.location;
+            } else {
+                document.getElementById('schedule-modal-title').textContent = 'Xếp Lịch Chạy / Lịch Dạy Mới';
+                document.getElementById('sch-edit-id').value = '';
+                const firstStu = appState.students[0];
+                stuSelect.value = firstStu.phone;
+                document.getElementById('sch-teacher').value = firstStu.teacher || 'Thầy Nguyễn Văn Hùng';
+                document.getElementById('sch-car').value = '30G-456.78 (Toyota Vios)';
+                document.getElementById('sch-date').value = '';
+                document.getElementById('sch-time').value = '07:30 - 11:30 (Ca sáng)';
+                document.getElementById('sch-content').value = 'Thực hành sa hình 11 bài liên hoàn';
+                document.getElementById('sch-location').value = 'Sân sát hạch Ngọc Hồi - Thanh Trì';
+            }
+
+            const m = document.getElementById('schedule-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function saveSchedule(e) {
+            e.preventDefault();
+            const id = document.getElementById('sch-edit-id').value;
+            const payload = {
+                studentPhone: document.getElementById('sch-student-phone').value,
+                teacher: document.getElementById('sch-teacher').value.trim(),
+                car: document.getElementById('sch-car').value.trim(),
+                date: document.getElementById('sch-date').value.trim(),
+                time: document.getElementById('sch-time').value.trim(),
+                content: document.getElementById('sch-content').value.trim(),
+                location: document.getElementById('sch-location').value.trim()
+            };
+
+            if (id) {
+                const idx = appState.schedules.findIndex(x => x.id === id);
+                appState.schedules[idx] = { ...appState.schedules[idx], ...payload };
+                showToast('Đã cập nhật lịch chạy xe!');
+            } else {
+                appState.schedules.unshift({ id: 'SC' + Date.now(), ...payload });
+                showToast('Đã thêm lịch chạy xe mới thành công!');
+            }
+            persistState();
+            closeModal('schedule-modal');
+            refreshAdminDashboard();
+        }
+
+        function deleteSchedule(id) {
+            showConfirm('Xóa lịch chạy xe', 'Bạn có chắc chắn muốn xóa buổi học này?', () => {
+                appState.schedules = appState.schedules.filter(x => x.id !== id);
+                persistState();
+                refreshAdminDashboard();
+                showToast('Đã xóa lịch chạy xe', 'info');
+            });
+        }
+
+        // 9.3 Hồ sơ đăng ký mới từ Trang chủ
+        function renderAdminRegistrations() {
+            const tbody = document.getElementById('adm-registrations-tbody');
+            if (appState.registrations.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500">Không có hồ sơ đăng ký mới nào đang chờ duyệt.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = appState.registrations.map(rg => `
+                <tr class="hover:bg-slate-50">
+                    <td class="py-3 px-4 text-xs font-semibold text-slate-600">${rg.date}</td>
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-slate-900">${rg.name}</div>
+                        <div class="text-xs font-mono font-bold text-blue-800">${rg.phone}</div>
+                    </td>
+                    <td class="py-3 px-4 font-bold text-amber-700">${rg.license}</td>
+                    <td class="py-3 px-4 text-slate-600 max-w-xs">${rg.note}</td>
+                    <td class="py-3 px-4 text-right whitespace-nowrap">
+                        <button onclick="approveRegistration('${rg.id}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold mr-1 transition">
+                            <i class="fa-solid fa-check mr-1"></i>Duyệt vào Học viên
+                        </button>
+                        <button onclick="deleteRegistration('${rg.id}')" class="p-2 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-700 hover:text-red-600 transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function approveRegistration(id) {
+            const rg = appState.registrations.find(x => x.id === id);
+            if (!rg) return;
+
+            if (!appState.students.some(s => s.phone === rg.phone)) {
+                appState.students.unshift({
+                    id: 'ST' + Date.now(),
+                    name: rg.name,
+                    phone: rg.phone,
+                    license: rg.license,
+                    course: 'Khóa mới',
+                    status: 'Đã hoàn thiện hồ sơ',
+                    teacher: 'Thầy Nguyễn Văn Hùng',
+                    feePaid: '0đ',
+                    feeTotal: '14.500.000đ'
+                });
+            }
+            appState.registrations = appState.registrations.filter(x => x.id !== id);
+            persistState();
+            refreshAdminDashboard();
+            showToast(`Đã duyệt ${rg.name} vào danh sách học viên!`);
+        }
+
+        function deleteRegistration(id) {
+            showConfirm('Xóa hồ sơ đăng ký', 'Xóa yêu cầu đăng ký này?', () => {
+                appState.registrations = appState.registrations.filter(x => x.id !== id);
+                persistState();
+                refreshAdminDashboard();
+                showToast('Đã xóa hồ sơ đăng ký', 'info');
+            });
+        }
+
+        // 9.4 & 9.5 Cài đặt App 600 Câu, Thông báo Thi & Văn Phòng
+        function loadSettingsForms() {
+            const s = appState.settings;
+            document.getElementById('cfg-app-title').value = s.appTitle;
+            document.getElementById('cfg-app-desc').value = s.appDesc;
+            document.getElementById('cfg-app-android').value = s.appAndroid;
+            document.getElementById('cfg-app-ios').value = s.appIos;
+            document.getElementById('cfg-app-pc').value = s.appPc;
+            document.getElementById('cfg-notice-title').value = s.noticeTitle;
+            document.getElementById('cfg-notice-content').value = s.noticeContent;
+
+            document.getElementById('cfg-office-name').value = s.officeName;
+            document.getElementById('cfg-office-phone').value = s.phone;
+            document.getElementById('cfg-office-address').value = s.address;
+            document.getElementById('cfg-admin-phone').value = s.adminPhone;
+            document.getElementById('cfg-admin-pass').value = s.adminPass;
+        }
+
+        function saveAppAndNoticeSettings(e) {
+            e.preventDefault();
+            appState.settings.appTitle = document.getElementById('cfg-app-title').value.trim();
+            appState.settings.appDesc = document.getElementById('cfg-app-desc').value.trim();
+            appState.settings.appAndroid = document.getElementById('cfg-app-android').value.trim();
+            appState.settings.appIos = document.getElementById('cfg-app-ios').value.trim();
+            appState.settings.appPc = document.getElementById('cfg-app-pc').value.trim();
+            appState.settings.noticeTitle = document.getElementById('cfg-notice-title').value.trim();
+            appState.settings.noticeContent = document.getElementById('cfg-notice-content').value.trim();
+
+            persistState();
+            applyDynamicSettingsToUI();
+            showToast('Đã cập nhật link tải App 600 câu & Thông báo lịch thi!');
+        }
+
+        function saveOfficeSettings(e) {
+            e.preventDefault();
+            appState.settings.officeName = document.getElementById('cfg-office-name').value.trim();
+            appState.settings.phone = document.getElementById('cfg-office-phone').value.trim();
+            appState.settings.address = document.getElementById('cfg-office-address').value.trim();
+            appState.settings.adminPhone = document.getElementById('cfg-admin-phone').value.trim();
+            appState.settings.adminPass = document.getElementById('cfg-admin-pass').value.trim();
+
+            persistState();
+            applyDynamicSettingsToUI();
+            showToast('Đã lưu thông tin văn phòng và cấu hình đăng nhập!');
+        }
+
+        // Xuất / Nhập file JSON sao lưu
+        function exportBackupJSON() {
+            const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const a = document.createElement('a');
+            a.setAttribute('href', dataStr);
+            a.setAttribute('download', `du-lieu-van-phong-tuan-anh-${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showToast('Đã tải xuống file sao lưu dữ liệu (.json)!');
+        }
+
+        function importBackupJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if (parsed.settings && Array.isArray(parsed.students) && Array.isArray(parsed.schedules)) {
+                        appState = parsed;
+                        persistState();
+                        applyDynamicSettingsToUI();
+                        refreshAdminDashboard();
+                        showToast('Nạp dữ liệu từ file sao lưu thành công!');
+                    } else {
+                        showToast('File sao lưu không đúng định dạng hệ thống!', 'error');
+                    }
+                } catch (err) {
+                    showToast('Lỗi đọc file JSON!', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetToDefaultData() {
+            showConfirm('Khôi phục dữ liệu mẫu', 'Toàn bộ chỉnh sửa hiện tại sẽ quay về dữ liệu mẫu ban đầu. Bạn chắc chắn chứ?', () => {
+                appState = {
+                    settings: { ...DEFAULT_SETTINGS },
+                    students: [...DEFAULT_STUDENTS],
+                    schedules: [...DEFAULT_SCHEDULES],
+                    registrations: [...DEFAULT_REGISTRATIONS]
+                };
+                persistState();
+                applyDynamicSettingsToUI();
+                refreshAdminDashboard();
+                showToast('Đã khôi phục dữ liệu mẫu ban đầu!');
+            });
+        }
+    </script>
+</body>
+</html>
